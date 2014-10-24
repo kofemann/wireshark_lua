@@ -90,6 +90,9 @@ local nfs_opnum3 = {
     [21] = 'COMMIT',
 };
 
+-- in s.ms
+local min_time_delta = 0.0
+
 do
 
   local ip4_dst = Field.new("ip.dst")
@@ -160,7 +163,10 @@ do
         local l = packets[xid]        
         if l ~= nul then
           packets[xid] = nil
-          print(frametime .. " " .. l.source .. " <=> " .. l.destination .. " " .. string.format("%.3f",frameepochtime - l.timestamp) .. " " .. l.op_code)
+          local time_delta = frameepochtime - l.timestamp
+          if time_delta > min_time_delta then
+            print(frametime .. " " .. l.source .. " <=> " .. l.destination .. " " .. string.format("%.3f",time_delta) .. " " .. l.op_code)
+          end
         end
      end
     end
