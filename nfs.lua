@@ -1,4 +1,10 @@
 -- nfs.lua
+--
+-- Copyright (c) 2014 Deutsches Elektronen-Synchroton,
+-- Member of the Helmholtz Association, (DESY), HAMBURG, GERMANY
+--
+-- This program is free software licensed under GPL version 2.
+-- 
 -- wireshark extention to process NFS packets
 --
 -- Example:
