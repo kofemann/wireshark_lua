@@ -1,7 +1,7 @@
 nfs.lua
 =============
 
-LUA extention for scripts for wireshark to print time spent by server
+LUA extention for wireshark to print time spent by server
 to process NFS requests.
 
 Usage:
