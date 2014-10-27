@@ -10,6 +10,8 @@
 -- Example:
 --  $ tshark -q -X lua_script:nfs.lua -f "port 2049"
 --  $ tshark -q -X lua_script:nfs.lua -r nfs.dump
+--  # with tshark > 1.12
+--  $ tshark -q -X lua_script:nfs.lua -X lua_script1:0.01 -r nfs.dump
 
 local nfs_opnum4 = {
     [3] = 'ACCESS',
@@ -98,6 +100,12 @@ local nfs_opnum3 = {
 
 -- in s.ms
 local min_time_delta = 0.0
+
+-- with wireshark 1.12 you can specify max time on a command line
+local arg = {...}
+if #arg > 0 then
+  min_time_delta = tonumber(arg[1])
+end
 
 do
 
