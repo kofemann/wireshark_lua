@@ -8,8 +8,8 @@
 -- wireshark extention to process NFS packets
 --
 -- Example:
---  $ tshark -r -X lua_script:nfs.lua -f "port 2049"
-
+--  $ tshark -q -X lua_script:nfs.lua -f "port 2049"
+--  $ tshark -q -X lua_script:nfs.lua -r nfs.dump
 
 local nfs_opnum4 = {
     [3] = 'ACCESS',
