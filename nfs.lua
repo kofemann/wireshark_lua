@@ -4,7 +4,7 @@
 -- Member of the Helmholtz Association, (DESY), HAMBURG, GERMANY
 --
 -- This program is free software licensed under GPL version 2.
--- 
+--
 -- wireshark extention to process NFS packets
 --
 -- Example:
@@ -89,7 +89,7 @@ local nfs_opnum3 = {
     [14] = 'RENAME',
     [15] = 'LINK',
     [16] = 'READDIR',
-    [17] = 'READDIRPLUS', 
+    [17] = 'READDIRPLUS',
     [18] = 'FSSTAT',
     [19] = 'FSINFO',
     [20] = 'PATHINFO',
@@ -159,14 +159,14 @@ do
       end
 
       if msgtyp == 0 then
-        packets[xid] = { 
+        packets[xid] = {
            timestamp = frameepochtime,
            source = tostring(ipsrc),
            destination = tostring(ipdst),
            op_code = nfs_op
         };
       else
-        local l = packets[xid]        
+        local l = packets[xid]
         if l ~= nul then
           packets[xid] = nil
           local time_delta = frameepochtime - l.timestamp
