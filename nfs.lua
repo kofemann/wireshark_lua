@@ -108,6 +108,22 @@ if #arg > 0 then
   min_time_delta = tonumber(arg[1])
 end
 
+--
+-- print a dtrace like histogram
+--
+local function histogramm(t)
+  local max = 0;
+  local term_size = 48
+  for n, v in pairs(t) do
+    if v > max then max = v end
+  end
+  for op,count in pairs(t) do
+    local hit = string.rep("#", (count*term_size) / max)
+    print("   "  .. string.format("%24s",op) .. " | " .. string.format("%6d", count) .. " | " .. hit)
+  end
+  
+end
+
 do
 
   local ip4_dst = Field.new("ip.dst")
@@ -160,10 +176,7 @@ do
         print("Total time spent by server: " .. string.format("%.3f",total_req_time) .. " sec.")
         print("Capture statistics:")
         print()
-        table.sort(ops)
-        for op,count in pairs(ops) do
-            print("   "  .. string.format("%24s",op) .. " | " .. count)
-        end
+        histogramm(ops)
     end
 
     function tap.packet(pinfo,tvb)
