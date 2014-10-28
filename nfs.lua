@@ -100,6 +100,7 @@ local nfs_opnum3 = {
 
 -- in s.ms
 local min_time_delta = 0.0
+local total_req_time = 0.0
 
 -- with wireshark 1.12 you can specify max time on a command line
 local arg = {...}
@@ -155,8 +156,9 @@ do
           time_delta = last_packet - first_packet
         end
         print()
-        print("Total capture time in sec: " .. string.format("%.3f",time_delta))
-        print("capture statistics:")
+        print("Total capture time: " .. string.format("%.3f",time_delta) .. " sec.")
+        print("Total time spent by server: " .. string.format("%.3f",total_req_time) .. " sec.")
+        print("Capture statistics:")
         print()
         table.sort(ops)
         for op,count in pairs(ops) do
@@ -204,6 +206,7 @@ do
         if l ~= nul then
           packets[xid] = nil
           local time_delta = frameepochtime - l.timestamp
+          total_req_time = total_req_time + time_delta
           if time_delta > min_time_delta then
             print(frametime .. " " .. l.source .. " <=> " .. l.destination .. " " .. string.format("%.3f",time_delta) .. " " .. l.op_code)
           end
