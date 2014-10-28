@@ -129,6 +129,9 @@ do
   local nfs_vers = Field.new("rpc.programversion")
 
   local packets = {}
+  local ops = {}
+  local first_packet = nil
+  local last_packet = nil
 
   local function init_listener()
 
@@ -143,6 +146,22 @@ do
       else
           return "v3_"..nfs_opnum3[ tonumber(tostring(nfs3_op())) ]
       end
+    end
+
+    function tap.draw()
+
+        local time_delta = 0;
+        if first_packet ~= nil then
+          time_delta = last_packet - first_packet
+        end
+        print()
+        print("Total capture time in sec: " .. string.format("%.3f",time_delta))
+        print("capture statistics:")
+        print()
+        table.sort(ops)
+        for op,count in pairs(ops) do
+            print("   "  .. string.format("%24s",op) .. " | " .. count)
+        end
     end
 
     function tap.packet(pinfo,tvb)
@@ -166,6 +185,11 @@ do
         ipdst = ip4_dst()
       end
 
+      if first_packet == nil then
+        first_packet = frameepochtime
+      end
+      last_packet = frameepochtime
+
       if msgtyp == 0 then
         packets[xid] = {
            timestamp = frameepochtime,
@@ -173,6 +197,8 @@ do
            destination = tostring(ipdst),
            op_code = nfs_op
         };
+        local op_count = ops[nfs_op] or 0
+        ops[nfs_op] = op_count + 1
       else
         local l = packets[xid]
         if l ~= nul then
