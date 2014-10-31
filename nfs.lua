@@ -100,7 +100,6 @@ local nfs_opnum3 = {
 
 -- in s.ms
 local min_time_delta = 0.0
-local total_req_time = 0.0
 
 -- with wireshark 1.12 you can specify max time on a command line
 local arg = {...}
@@ -108,20 +107,36 @@ if #arg > 0 then
   min_time_delta = tonumber(arg[1])
 end
 
---
--- print a dtrace like histogram
---
-local function histogramm(t)
-  local max = 0;
-  local term_size = 48
-  for n, v in pairs(t) do
-    if v > max then max = v end
+local function timediff_to_string(s)
+
+  local days_in_sec = 86400
+  local hour_in_sec = 3600
+  local min_in_sec = 60
+  local t = s
+  local result = ""
+
+  local days = math.floor(t / days_in_sec)
+  if days > 0.9 then
+    t = t - days * days_in_sec
+    result = result .. days .. " day"
+    if days > 2 then result = result .. "s" end
   end
-  for op,count in pairs(t) do
-    local hit = string.rep("#", (count*term_size) / max)
-    print("   "  .. string.format("%24s",op) .. " | " .. string.format("%6d", count) .. " | " .. hit)
+
+  local hours = math.floor(t / hour_in_sec)
+  if hours > 0.9 then
+    t = t - hours * hour_in_sec
+    result = result .. " " .. hours .. " hour"
+    if hours > 2 then result = result .. "s" end
   end
-  
+
+  local mins = math.floor(t / min_in_sec)
+  if mins > 0.9 then
+    t = t - mins * min_in_sec
+    result = result .. " " .. mins .. " min"
+  end
+
+  result = result .. " " .. string.format("%.3f",t) .. " sec"
+  return result
 end
 
 do
@@ -147,6 +162,8 @@ do
 
   local packets = {}
   local ops = {}
+  local avg_times = {}
+
   local first_packet = nil
   local last_packet = nil
 
@@ -165,6 +182,29 @@ do
       end
     end
 
+    function update_avg_time(op, v)
+      local count = ops[op]
+      local current_avg = avg_times[op] or 0
+      avg_times[op] = (current_avg * (count - 1) + v) / count
+    end
+
+    --
+    -- print a dtrace like histogram
+    --
+    function histogramm()
+      local max = 0;
+      local term_size = 48
+      for n, v in pairs(ops) do
+        if v > max then max = v end
+      end
+      print("             NFS operation  |  Count | Avg(t)|")
+      print("----------------------------+--------+-------+-----------------------------------------------------------")
+      for op,count in pairs(ops) do
+        local hit = string.rep("#", (count*term_size) / max)
+        print("   "  .. string.format("%24s",op) .. " | " .. string.format("%6d", count) .. " | " .. string.format("%3.3f", avg_times[op]) .. " | " .. hit)
+      end
+    end
+
     function tap.draw()
 
         local time_delta = 0;
@@ -172,11 +212,10 @@ do
           time_delta = last_packet - first_packet
         end
         print()
-        print("Total capture time: " .. string.format("%.3f",time_delta) .. " sec.")
-        print("Total time spent by server: " .. string.format("%.3f",total_req_time) .. " sec.")
+        print("Total capture time: " .. timediff_to_string(time_delta))
         print("Capture statistics:")
         print()
-        histogramm(ops)
+        histogramm()
     end
 
     function tap.packet(pinfo,tvb)
@@ -219,7 +258,7 @@ do
         if l ~= nul then
           packets[xid] = nil
           local time_delta = frameepochtime - l.timestamp
-          total_req_time = total_req_time + time_delta
+          update_avg_time(l.op_code, time_delta)
           if time_delta > min_time_delta then
             print(frametime .. " " .. l.source .. " <=> " .. l.destination .. " " .. string.format("%.3f",time_delta) .. " " .. l.op_code)
           end
