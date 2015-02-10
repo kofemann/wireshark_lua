@@ -11,6 +11,9 @@ $ tshark -q -X lua_script:nfs.lua -f "port 2049"
 
 # for read from existing capture file capture file
 $ tshark -q -r nfs.dump -X lua_script:nfs.lua
+
+# or if you need to avoid temp files
+$ dumpcap -q -w - -f "port 2049" 2>/dev/null | tshark -r - -q -X lua_script:nfs.lua
 ```
 
 An example output looks like:
