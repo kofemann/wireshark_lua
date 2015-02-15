@@ -16,6 +16,11 @@ $ tshark -q -r nfs.dump -X lua_script:nfs.lua
 $ dumpcap -q -w - -f "port 2049" 2>/dev/null | tshark -r - -q -X lua_script:nfs.lua
 ```
 
+Eventually, you need to enable LUA extension on some distributions (RHEL6) in **/usr/share/wireshark/init.lua**
+```
+run_user_scripts_when_superuser = true
+disable_lua = false
+```
 An example output looks like:
 
 |**timestamp** |  **client ip** | **server ip** | **time in sec.ms** | **nfs op / compound main op**|
