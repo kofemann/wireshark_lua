@@ -1,6 +1,6 @@
 -- nfs.lua
 --
--- Copyright (c) 2014 Deutsches Elektronen-Synchroton,
+-- Copyright (c) 2014 - 2005 Deutsches Elektronen-Synchroton,
 -- Member of the Helmholtz Association, (DESY), HAMBURG, GERMANY
 --
 -- This program is free software licensed under GPL version 2.
@@ -9,9 +9,11 @@
 --
 -- Example:
 --  $ tshark -q -X lua_script:nfs.lua -f "port 2049"
+--  $ tshark -q -X lua_script:nfs.lua -f "port 32049" -d tcp.port==32049,rpc
 --  $ tshark -q -X lua_script:nfs.lua -r nfs.dump
 --  # with tshark > 1.12
 --  $ tshark -q -X lua_script:nfs.lua -X lua_script1:0.01 -r nfs.dump
+--  $ dumpcap -q -w - -f "port 2049" 2>/dev/null | tshark -r - -q -X lua_script:nfs.lua
 
 local nfs_opnum4 = {
     [3] = 'ACCESS',
