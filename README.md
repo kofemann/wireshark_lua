@@ -10,7 +10,7 @@ Usage:
 $ tshark -q -X lua_script:nfs.lua -f "port 2049"
 
 # or if nfs trafic is not on a standard port ( pNFS DS )
-$ tshark -q -X lua_script:nfs.lua -f "port 2049" -d tcp.port==32049,rpc
+$ tshark -q -X lua_script:nfs.lua -f "port 32049" -d tcp.port==32049,rpc
 
 # for read from existing capture file capture file
 $ tshark -q -r nfs.dump -X lua_script:nfs.lua
