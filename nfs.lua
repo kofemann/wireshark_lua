@@ -202,7 +202,7 @@ do
       print("             NFS operation  |  Count | Avg(t)|")
       print("----------------------------+--------+-------+-----------------------------------------------------------")
       for op,count in pairs(ops) do
-        local hit = string.rep("#", (count*term_size) / max)
+        local hit = string.rep("#", math.floor((count*term_size) / max))
         print("   "  .. string.format("%24s",op) .. " | " .. string.format("%6d", count) .. " | " .. string.format("%3.3f", avg_times[op]) .. " | " .. hit)
       end
     end
