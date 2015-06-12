@@ -203,7 +203,7 @@ do
       print("----------------------------+--------+-------+-----------------------------------------------------------")
       for op,count in pairs(ops) do
         local hit = string.rep("#", math.floor((count*term_size) / max))
-        print("   "  .. string.format("%24s",op) .. " | " .. string.format("%6d", count) .. " | " .. string.format("%3.3f", avg_times[op]) .. " | " .. hit)
+        print(string.format("   %24s | %6d | %3.3f | %s",op, count, avg_times[op], hit))
       end
     end
 
@@ -262,7 +262,7 @@ do
           local time_delta = frameepochtime - l.timestamp
           update_avg_time(l.op_code, time_delta)
           if time_delta > min_time_delta then
-            print(frametime .. " " .. l.source .. " <=> " .. l.destination .. " " .. string.format("%.3f",time_delta) .. " " .. l.op_code)
+            print(string.format("%s [%x] %s <=> %s %.3f %s", frametime, xid, l.source, l.destination, time_delta, l.op_code))
           end
         end
      end
